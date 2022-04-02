@@ -75,4 +75,47 @@ public static class Vector3Util
         }
         me.rotation = Quaternion.Slerp(me.transform.rotation, desiredRotation, rotationSpeed * Time.deltaTime);
     }
+    Vector3 randomPoint = agent.transform.position + Random.insideUnitSphere * Range.value;
+            
+    NavMeshHit hit;
+        if (NavMesh.SamplePosition(new Vector3(randomPoint.x, 1, randomPoint.z), out hit, 1f, NavMesh.AllAreas))
+    {
+        //GameObject.Instantiate(Sphere.value, hit.position + new Vector3(0, 1, 0), Quaternion.identity);
+
+        //Debug.DrawRay(hit.position + new Vector3(0, 1, 0), Target.value.transform.position - hit.position, Color.red, 2f);
+
+        if (Physics.Raycast(hit.position + new Vector3(0, 1, 0), (Target.value.transform.position - hit.position).normalized * 100, out RaycastHit rayHit, 100f, LineOfSightLayers.value))
+        {
+            if (rayHit.collider.transform.root.gameObject == Target.value.gameObject)
+            {
+                Debug.DrawRay(hit.position + new Vector3(0, 1, 0), (Target.value.transform.position - hit.position).normalized * 100, Color.green, 4f);
+
+                DesiredDestination.value = hit.position;
+                //Agent.value.SetDestination(hit.position);
+                EndAction(true);
+            }
+            else
+            {
+                Debug.DrawRay(hit.position + new Vector3(0, 1, 0), (Target.value.transform.position - hit.position).normalized * 100, Color.red, .1f);
+                EndAction(false);
+
+            }
+        }
+        else
+        {
+            Debug.Log("raycast failed");
+            EndAction(false);
+
+        }
+    }
+else
+{
+    Debug.Log("sample pos failed");
+    EndAction(false);
+
+}
+//}
+        
+        
+}
 }
